@@ -1,0 +1,11 @@
+# Don't track content of these folders
+results/
+
+
+# Compiled source #
+###################
+*.npy
+*.png
+*.sav
+*.h5
+*.idea
