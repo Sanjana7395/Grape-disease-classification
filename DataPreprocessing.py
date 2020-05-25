@@ -1,13 +1,14 @@
-import os, os.path
 import json
+import os
+import os.path
 import cv2
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.utils import shuffle
+import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 
-ROOT_DIR = '/home/pavan/code/sjsu/cmpe257/Project'
+ROOT_DIR = 'images/'
 
 
 # get json files
@@ -149,7 +150,8 @@ print(X_test.shape)
 print(X_train.shape)
 
 # Save data
-np.save('ImageTest_input.npy', X_test)
-np.save('DiseaseTest_input.npy', y_test)
-np.save('ImageTrain_input.npy', X_train)
-np.save('DiseaseTrain_input.npy', y_train)
+np.save('data/ImageTest_input.npy', X_test)
+np.save('data/DiseaseTest_input.npy', y_test)
+np.save('data/ImageTrain_input.npy', X_train)
+np.save('data/DiseaseTrain_input.npy', y_train)
+

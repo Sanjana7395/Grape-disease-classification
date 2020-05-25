@@ -2,19 +2,19 @@ from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Conv2D, Activation
 from tensorflow.keras.optimizers import Adam
+import pickle
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Load stored data
-X_train = np.load('ImageTrain_input.npy')
-y_train = np.load('DiseaseTrain_input.npy')
+X_train = np.load('data/ImageAugment_input.npy')
+y_train = np.load('data/DiseaseAugment_input.npy')
 print(X_train.shape)
 print(y_train.shape)
 
-X_test = np.load('ImageTest_input.npy')
-y_test = np.load('DiseaseTest_input.npy')
+X_test = np.load('data/ImageTest_input.npy')
+y_test = np.load('data/DiseaseTest_input.npy')
 print(X_test.shape)
 print(y_test.shape)
 
@@ -40,6 +40,9 @@ prediction_layer = Dense(num_classes, activation='softmax')
 
 modelvgg16 = Sequential([
     VGG16_MODEL,
+    Conv2D(512, kernel_size=(3, 3), padding='same'),
+    Activation('relu'),
+    Conv2D(1024, kernel_size=(3, 3), padding='same'),
     global_average_layer,
     prediction_layer
 ])
@@ -50,25 +53,28 @@ modelvgg16.compile(optimizer=Adam(), loss="categorical_crossentropy", metrics=['
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                  patience=5, min_lr=0.00001)
 history_custom = modelvgg16.fit(X_train, y_train, batch_size=8,
-                                epochs=40, verbose=1, validation_split=.1, callbacks=[reduce_lr])
+                                epochs=20, verbose=1, validation_split=.1, callbacks=[reduce_lr])
 scores = modelvgg16.evaluate(X_test, y_test, verbose=0)
 print("TEST SET: %s: %.2f%%" % (modelvgg16.metrics_names[1], scores[1] * 100))
 
-# Plot training & validation accuracy values
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.plot(history_custom.history['acc'])
-ax1.plot(history_custom.history['val_acc'])
-ax1.set_title('Model accuracy')
-ax1.set_ylabel('Accuracy')
-ax1.set_xlabel('Epoch')
-ax1.legend(['Train', 'Validation'], loc='upper left')
+print(modelvgg16.summary())
+print(VGG16_MODEL.summary())
 
-# Plot training & validation loss values
-ax2.plot(history_custom.history['loss'])
-ax2.plot(history_custom.history['val_loss'])
-ax2.set_title('Model loss')
-ax2.set_ylabel('Loss')
-ax2.set_xlabel('Epoch')
-ax2.legend(['Train', 'Validation'], loc='upper right')
+# save model
+modelvgg16.save('models/vgg16.h5')
+history = dict()
+history['acc'] = history_custom.history['acc']
+history['val_acc'] = history_custom.history['val_acc']
+history['loss'] = history_custom.history['loss']
+history['val_loss'] = history_custom.history['val_loss']
 
-plt.savefig('results/VG1.png')
+
+class Hist():
+    def __init__(self):
+        pass
+
+
+hist = Hist()
+setattr(hist, 'history', history)
+pickle.dump(hist, open('vgg16_training_history.pkl', 'wb'))
+

@@ -5,16 +5,16 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense, Activation
 from tensorflow.keras.optimizers import Adam
 import numpy as np
-import matplotlib.pyplot as plt
+import pickle
 
 # Load stored data
-X_train = np.load('ImageTrain_input.npy')
-y_train = np.load('DiseaseTrain_input.npy')
+X_train = np.load('data/ImageAugment_input.npy')
+y_train = np.load('data/DiseaseAugment_input.npy')
 print(X_train.shape)
 print(y_train.shape)
 
-X_test = np.load('ImageTest_input.npy')
-y_test = np.load('DiseaseTest_input.npy')
+X_test = np.load('data/ImageTest_input.npy')
+y_test = np.load('data/DiseaseTest_input.npy')
 print(X_test.shape)
 print(y_test.shape)
 
@@ -37,31 +37,31 @@ model_custom = Sequential([
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     MaxPooling2D(pool_size=(2, 2)),
-    # 128 x 128
+
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     MaxPooling2D(pool_size=(2, 2)),
-    # 64 x 64
+
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     MaxPooling2D(pool_size=(2, 2)),
-    # 32 x 32
+
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     MaxPooling2D(pool_size=(2, 2)),
-    # 16 x 16
+
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     Conv2D(32, kernel_size=(3, 3), padding='same'),
     Activation('relu'),
     MaxPooling2D(pool_size=(2, 2)),
-    # 8 x 8
+
     Flatten(),
     Dropout(0.5),
     Dense(128),
@@ -76,26 +76,28 @@ model_custom.compile(optimizer=Adam(),
 reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
                                                  patience=5, min_lr=0.00001)
 history_custom = model_custom.fit(X_train, y_train, batch_size=8,
-                                  epochs=40, verbose=1, validation_split=.1, callbacks=[reduce_lr])
+                                  epochs=17, verbose=1, validation_split=.1, callbacks=[reduce_lr])
 scores = model_custom.evaluate(X_test, y_test, verbose=0)
 print("TEST SET: %s: %.2f%%" % (model_custom.metrics_names[1], scores[1] * 100))
 
+print(model_custom.summary())
 
-# Plot training & validation accuracy values
-fig, (ax1, ax2) = plt.subplots(1, 2)
-ax1.plot(history_custom.history['acc'])
-ax1.plot(history_custom.history['val_acc'])
-ax1.set_title('Model accuracy')
-ax1.set_ylabel('Accuracy')
-ax1.set_xlabel('Epoch')
-ax1.legend(['Train', 'Validation'], loc='upper left')
+# save model
+model_custom.save('models/custom.h5')
 
-# Plot training & validation loss values
-ax2.plot(history_custom.history['loss'])
-ax2.plot(history_custom.history['val_loss'])
-ax2.set_title('Model loss')
-ax2.set_ylabel('Loss')
-ax2.set_xlabel('Epoch')
-ax2.legend(['Train', 'Validation'], loc='upper right')
+history = dict()
+history['acc'] = history_custom.history['acc']
+history['val_acc'] = history_custom.history['val_acc']
+history['loss'] = history_custom.history['loss']
+history['val_loss'] = history_custom.history['val_loss']
 
-plt.savefig('results/CC1.png')
+
+class Hist():
+    def __init__(self):
+        pass
+
+
+hist = Hist()
+setattr(hist, 'history', history)
+pickle.dump(hist, open('custom_training_history.pkl', 'wb'))
+

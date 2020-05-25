@@ -1,5 +1,8 @@
 # Don't track content of these folders
-results/
+output/
+images/
+data/
+models/
 
 
 # Compiled source #
@@ -9,3 +12,5 @@ results/
 *.sav
 *.h5
 *.idea
+*.csv
+*.zip

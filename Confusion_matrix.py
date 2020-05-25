@@ -3,14 +3,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix
+from sklearn.preprocessing import LabelEncoder
+from tensorflow.keras.models import load_model
 
-X_test = np.load('ImageTestHOG_input.npy')
-y_test = np.load('DiseaseTest_input.npy')
+X_test = np.load('data/ImageTestHOG_input.npy')
+y_test = np.load('data/DiseaseTest_input.npy')
 print(X_test.shape)
 print(y_test.shape)
 
 
-### Beautify confusion matrix ###
+# Beautify confusion matrix
 
 def make_confusion_matrix(cf,
                           group_names=None,
@@ -84,12 +86,23 @@ def make_confusion_matrix(cf,
 
 # Predicting and determining the confusion matrix
 
-loadedrfc_model = joblib.load('Random_model.sav')
-Random_classifier_prediction = loadedrfc_model.predict(X_test)
-corr_rfc = confusion_matrix(y_test, Random_classifier_prediction)
+loadedc_model = joblib.load('models/Random_model.sav')
+# loadedc_model = joblib.load('models/SVM_model.sav')
+classifier_prediction = loadedc_model.predict(X_test)
 
-make_confusion_matrix(corr_rfc,
-                      group_names=None,
+# classifier_prediction = np.load('models/Ensemble.npy')
+
+corr_rfc = confusion_matrix(y_test, classifier_prediction)
+
+# labelencoder = LabelEncoder()
+# y_test1 = labelencoder.fit(y_test)
+# en_model = load_model('models/custom_ensemble.h5')
+# y_pred = en_model.predict(np.load('X_test_ensemble.npy'))
+# vgg_prediction = np.argmax(y_pred, axis=-1)
+# vgg_prediction = labelencoder.inverse_transform(vgg_prediction)
+# corr_rfc = confusion_matrix(y_test, vgg_prediction)
+
+make_confusion_matrix(corr_rfc, group_names=None,
                       categories=['blackrot', 'ecsa', 'healthy', 'leafblight', 'pmildew'],
                       count=True,
                       percent=True,
@@ -98,11 +111,11 @@ make_confusion_matrix(corr_rfc,
                       xyplotlabels=True,
                       sum_stats=True,
                       figsize=(8, 6),
-                      cmap='Blues',
+                      cmap='OrRd',
                       title='Confusion matrix')
 # error correction - cropped heat map
 b, t = plt.ylim()  # discover the values for bottom and top
 b += 0.5  # Add 0.5 to the bottom
 t -= 0.5  # Subtract 0.5 from the top
 plt.ylim(b, t)  # update the ylim(bottom, top) values
-plt.savefig('results/RF4.png', bbox_inches='tight')
+plt.savefig('output/ensemble/confusion_matrix_en2.png', bbox_inches='tight')

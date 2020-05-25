@@ -5,16 +5,15 @@ from skimage.feature import hog
 # Feature Extraction - histogram of oriented gradients
 def hog_feature(image, multichannel=True):
     hog_feature_var = hog(image)
-
     return hog_feature_var
 
 
 # Load stored data
-X_train = np.load('ImageTrain_input.npy')
+X_train = np.load('data/ImageAugment_input.npy')
 print('train data')
 print(X_train.shape)
 
-X_test = np.load('ImageTest_input.npy')
+X_test = np.load('data/ImageTest_input.npy')
 print('test data')
 print(X_test.shape)
 
@@ -29,5 +28,5 @@ for i in range(len(X_test)):
 print(RF_test.shape)
 
 # Save data
-np.save('ImageTestHOG_input.npy', RF_test)
-np.save('ImageTrainHOG_input.npy', RF_train)
+np.save('data/ImageTestHOG_input.npy', RF_test)
+np.save('data/ImageTrainHOG_input.npy', RF_train)
