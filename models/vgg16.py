@@ -1,16 +1,17 @@
 from sklearn.preprocessing import LabelEncoder
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Conv2D, Activation
 from tensorflow.keras.optimizers import Adam
 import pickle
-import numpy as np
+from preprocessing.utils import make_folder
 
 NUM_CLASSES = 5
 
 
-class Hist():
+class Hist:
     """ Dummy class
 
     """
@@ -108,6 +109,7 @@ def main():
     print(VGG16_MODEL.summary())
 
     # save model
+    make_folder('../results/models')
     model_vgg16.save('../results/models/vgg16.h5')
     history = dict()
     history['acc'] = history_custom.history['acc']

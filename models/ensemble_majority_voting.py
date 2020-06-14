@@ -1,10 +1,10 @@
 import os
-import joblib
 import numpy as np
 from tensorflow.keras.utils import to_categorical
-from sklearn.preprocessing import LabelEncoder
 from tensorflow.keras.models import load_model
+from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
+import joblib
 
 ROOT_DIR = '../results/models/'
 
@@ -99,30 +99,36 @@ def main():
     y_test2 = labeler.fit_transform(y_test1)
     y_test2 = to_categorical(y_test2, num_classes=5)
 
-    rf_model = joblib.load(os.path.join(ROOT_DIR, 'Random_model.sav'))
-    sv_model = joblib.load(os.path.join(ROOT_DIR, 'SVM_model.sav'))
-    custom_model = load_model(os.path.join(ROOT_DIR, 'custom.h5'))
-    vgg_model = load_model(os.path.join(ROOT_DIR, 'vgg16.h5'))
+    try:
+        rf_model = joblib.load(os.path.join(ROOT_DIR, 'Random_model.sav'))
+        sv_model = joblib.load(os.path.join(ROOT_DIR, 'SVM_model.sav'))
+        custom_model = load_model(os.path.join(ROOT_DIR, 'custom.h5'))
+        vgg_model = load_model(os.path.join(ROOT_DIR, 'vgg16.h5'))
 
-    # Normalize image for CNN
-    X_test2 = (X_test2 / 255.0).astype(np.float32)
+        # Normalize image for CNN
+        X_test2 = (X_test2 / 255.0).astype(np.float32)
 
-    rf_prediction = rf_model.predict(X_test1)
-    sv_prediction = sv_model.predict(X_test1)
-    custom_prediction = np.argmax(custom_model.predict(X_test2), axis=-1)
-    custom_prediction = labeler.inverse_transform(custom_prediction)
-    vgg_prediction = np.argmax(vgg_model.predict(X_test2), axis=-1)
-    vgg_prediction = labeler.inverse_transform(vgg_prediction)
+        rf_prediction = rf_model.predict(X_test1)
+        sv_prediction = sv_model.predict(X_test1)
+        custom_prediction = np.argmax(custom_model.predict(X_test2), axis=-1)
+        custom_prediction = labeler.inverse_transform(custom_prediction)
+        vgg_prediction = np.argmax(vgg_model.predict(X_test2), axis=-1)
+        vgg_prediction = labeler.inverse_transform(vgg_prediction)
 
-    final_prediction = majority_voting(rf_prediction,
-                                       sv_prediction,
-                                       custom_prediction,
-                                       vgg_prediction)
-    # Compute accuracy
-    print("ACCURACY:", accuracy_score(y_test1, final_prediction))
+        final_prediction = majority_voting(rf_prediction,
+                                           sv_prediction,
+                                           custom_prediction,
+                                           vgg_prediction)
+        # Compute accuracy
+        print("ACCURACY:", accuracy_score(y_test1, final_prediction))
 
-    # Save model
-    np.save(os.path.join(ROOT_DIR, 'Ensemble.npy'), final_prediction)
+        # Save model
+        np.save(os.path.join(ROOT_DIR, 'Ensemble.npy'), final_prediction)
+
+    except FileNotFoundError as err:
+        print('[ERROR] Train random forest, SVM, CNN-custom '
+              'and VGG16 models before executing ensemble model!')
+        print('[ERROR MESSAGE]', err)
 
 
 if __name__ == "__main__":

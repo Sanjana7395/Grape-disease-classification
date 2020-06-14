@@ -1,11 +1,12 @@
 from sklearn.preprocessing import LabelEncoder
+import numpy as np
 import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 import tensorflow.keras.layers as layers
 from tensorflow.keras.optimizers import Adam
-import numpy as np
 import pickle
+from preprocessing.utils import make_folder
 
 NUM_CLASSES = 5
 
@@ -114,7 +115,7 @@ def main():
                                                      patience=5,
                                                      min_lr=0.00001)
     history_custom = model_custom.fit(X_train, y_train, batch_size=8,
-                                      epochs=17, verbose=1,
+                                      epochs=1, verbose=1,
                                       validation_split=.1,
                                       callbacks=[reduce_lr])
     scores = model_custom.evaluate(X_test, y_test, verbose=0)
@@ -126,6 +127,7 @@ def main():
     print(model_custom.summary())
 
     # save model
+    make_folder('../results/models/')
     model_custom.save('../results/models/custom.h5')
 
     history = dict()

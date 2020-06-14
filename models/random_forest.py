@@ -1,6 +1,7 @@
+import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 import joblib
-import numpy as np
+from preprocessing.utils import make_folder
 
 
 def main():
@@ -31,6 +32,7 @@ def main():
     Random_classifier.fit(X_train, y_train)
     print(Random_classifier.score(X_test, y_test))
 
+    make_folder('../results/models')
     filename = '../results/models/Random_model.sav'
     joblib.dump(Random_classifier, filename)
 

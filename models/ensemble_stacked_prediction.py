@@ -1,18 +1,18 @@
-import joblib
+import os
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-from tensorflow.keras.models import load_model
 from scipy.special import softmax
 import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dropout, Dense, Activation
 from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import load_model
 import pickle
-import os
+import joblib
 
 NUM_CLASS = 5
-ROOT_DIR = '..results/models/'
+ROOT_DIR = '../results/models/'
 
 
 class Hist:
@@ -98,60 +98,66 @@ def main():
     y_test2 = encoder(y_test1, NUM_CLASS)
     y_train2 = encoder(y_train1, NUM_CLASS)
 
-    rf_model = joblib.load(os.path.join(ROOT_DIR, 'Random_model.sav'))
-    sv_model = joblib.load(os.path.join(ROOT_DIR, 'SVM_model.sav'))
-    custom_model = load_model(os.path.join(ROOT_DIR, 'custom.h5'))
-    vgg_model = load_model(os.path.join(ROOT_DIR, 'vgg16.h5'))
+    try:
+        rf_model = joblib.load(os.path.join(ROOT_DIR, 'Random_model.sav'))
+        sv_model = joblib.load(os.path.join(ROOT_DIR, 'SVM_model.sav'))
+        custom_model = load_model(os.path.join(ROOT_DIR, 'custom.h5'))
+        vgg_model = load_model(os.path.join(ROOT_DIR, 'vgg16.h5'))
 
-    X_train_f = get_predictions(X_train1, X_train2,
-                                [rf_model, sv_model, custom_model, vgg_model])
-    X_test_f = get_predictions(X_test1, X_test2,
-                               [rf_model, sv_model, custom_model, vgg_model])
-    np.save('../data/test/X_test_ensemble.npy', X_test_f)
+        X_train_f = get_predictions(X_train1, X_train2,
+                                    [rf_model, sv_model, custom_model, vgg_model])
+        X_test_f = get_predictions(X_test1, X_test2,
+                                   [rf_model, sv_model, custom_model, vgg_model])
+        np.save('../data/test/X_test_ensemble.npy', X_test_f)
 
-    # Custom CNN model
-    model_custom = Sequential([
-        Dense(128, input_shape=(20,)),
-        Activation('relu'),
-        Dropout(0.5),
-        Dense(256),
-        Activation('relu'),
-        Dense(NUM_CLASS, activation='softmax')])
+        # Custom CNN model
+        model_custom = Sequential([
+            Dense(128, input_shape=(20,)),
+            Activation('relu'),
+            Dropout(0.5),
+            Dense(256),
+            Activation('relu'),
+            Dense(NUM_CLASS, activation='softmax')])
 
-    model_custom.compile(optimizer=Adam(),
-                         loss="categorical_crossentropy",
-                         metrics=['accuracy'])
+        model_custom.compile(optimizer=Adam(),
+                             loss="categorical_crossentropy",
+                             metrics=['accuracy'])
 
-    # Learning rate decay
-    reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-                                                     factor=0.2,
-                                                     patience=5,
-                                                     min_lr=0.00001)
-    history_custom = model_custom.fit(X_train_f, y_train2,
-                                      batch_size=64,
-                                      epochs=1, verbose=1,
-                                      validation_split=.1,
-                                      callbacks=[reduce_lr])
-    scores = model_custom.evaluate(X_test_f, y_test2, verbose=0)
-    print("========================")
-    print("TEST SET: %s: %.2f%%" % (model_custom.metrics_names[1],
-                                    scores[1] * 100))
-    print("========================")
+        # Learning rate decay
+        reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
+                                                         factor=0.2,
+                                                         patience=5,
+                                                         min_lr=0.00001)
+        history_custom = model_custom.fit(X_train_f, y_train2,
+                                          batch_size=64,
+                                          epochs=1, verbose=1,
+                                          validation_split=.1,
+                                          callbacks=[reduce_lr])
+        scores = model_custom.evaluate(X_test_f, y_test2, verbose=0)
+        print("========================")
+        print("TEST SET: %s: %.2f%%" % (model_custom.metrics_names[1],
+                                        scores[1] * 100))
+        print("========================")
 
-    print(model_custom.summary())
+        print(model_custom.summary())
 
-    # save model
-    model_custom.save(os.path.join(ROOT_DIR, 'custom_ensemble.h5'))
+        # save model
+        model_custom.save(os.path.join(ROOT_DIR, 'custom_ensemble.h5'))
 
-    history = dict()
-    history['acc'] = history_custom.history['acc']
-    history['val_acc'] = history_custom.history['val_acc']
-    history['loss'] = history_custom.history['loss']
-    history['val_loss'] = history_custom.history['val_loss']
+        history = dict()
+        history['acc'] = history_custom.history['acc']
+        history['val_acc'] = history_custom.history['val_acc']
+        history['loss'] = history_custom.history['loss']
+        history['val_loss'] = history_custom.history['val_loss']
 
-    hist = Hist()
-    setattr(hist, 'history', history)
-    pickle.dump(hist, open(os.path.join(ROOT_DIR, 'stacked_training_history.pkl'), 'wb'))
+        hist = Hist()
+        setattr(hist, 'history', history)
+        pickle.dump(hist, open(os.path.join(ROOT_DIR, 'stacked_training_history.pkl'), 'wb'))
+
+    except FileNotFoundError as err:
+        print('[ERROR] Train random forest, SVM, CNN-custom '
+              'and VGG16 models before executing ensemble model!')
+        print('[ERROR MESSAGE]', err)
 
 
 if __name__ == "__main__":

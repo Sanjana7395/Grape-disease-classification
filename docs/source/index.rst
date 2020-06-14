@@ -16,6 +16,8 @@ Grape Disease Classification
    result
 
 
+Technology used - Tensorflow (1.14.0)
+
 This project classifies diseases in grape plant using various Machine Learning classification algorithms.
 Grape plants are susceptible to various diseases The diseases that are classified in this project are:
 

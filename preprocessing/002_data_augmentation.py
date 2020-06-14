@@ -1,6 +1,7 @@
 import numpy as np
 import random
 from skimage import transform, exposure
+from preprocessing.utils import make_folder
 
 
 def random_rotation(img):
@@ -162,6 +163,7 @@ def main():
     print(y_train.shape)
 
     # Save data
+    make_folder('../data/augment')
     np.save('../data/augment/ImageAugment_input.npy', X_train)
     np.save('../data/augment/DiseaseAugment_input.npy', y_train)
 

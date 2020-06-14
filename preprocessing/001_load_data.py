@@ -1,12 +1,13 @@
-import json
 import os
 import os.path
+import json
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
+from preprocessing.utils import make_folder
 
 ROOT_DIR = '../data/raw/'
 
@@ -225,6 +226,8 @@ def main():
     print(X_train.shape)
 
     # Save data
+    make_folder('../data/test')
+    make_folder('../data/intermediate')
     np.save('../data/test/ImageTest_input.npy', X_test)
     np.save('../data/test/DiseaseTest_input.npy', y_test)
     np.save('../data/intermediate/ImageTrain_input.npy', X_train)

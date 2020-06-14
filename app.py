@@ -1,11 +1,12 @@
+import os
 import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 from scipy.special import softmax
-import joblib
 from tensorflow.keras.models import load_model
 from sklearn.preprocessing import LabelEncoder
-import os
+import joblib
+from preprocessing.utils import make_folder
 
 ROOT_DIR = 'results/models/'
 
@@ -50,7 +51,8 @@ def plot(image, label, index, model, x_hog):
                                                                  np.max(percent[index]) * 100),
                          color="red")
 
-    plt.savefig('output/app.png', bbox_inches='tight')
+    make_folder('results/visualization')
+    plt.savefig('results/visualization/app.png', bbox_inches='tight')
 
 
 def model_predict(model, x, hog, y):

@@ -3,9 +3,21 @@ Documentation for the code
 
 1. Pre processing
       This folder contains
-         A. codes to load the images and json(contains labelling information) files.
-         B. augment data.
-         C. Extract histograms of feature descriptors.
+         A. Code to load the images and json(contains labelling information) files. This is present in
+            preprocessing/001_load_data.py. To execute this code, within the 'preprocessing' folder enter the below
+            command. ::
+
+                python 001_load_data.py
+
+         B. Augment data. The code is present in preproprocessing/002_data_augmentation.py. To execute, run
+            the below command. ::
+
+                python 002_data_augmentation.py
+
+         C. Extract histograms of feature descriptors. Feature descriptors are used to train only
+            random forest and SVM. The code is present in preprocessing/003_hog.py. ::
+
+                python 003_hog.py
 
 2. Models
       This folder contains various models used in this project namely:
@@ -16,7 +28,10 @@ Documentation for the code
          E. Ensemble model - Majority voting
          F. Ensemble model - Stacked prediction
 
-      The ensemble models are the aggregation of random forest, SVM, CNN-custom and CNN-VGG16
+      The ensemble models are the aggregation of random forest, SVM, CNN-custom and CNN-VGG16.
+      The models can be trained by executing the below command within the models folder. ::
+
+          python <model_name>.py
 
 3. visualization.py
       This file contains all the visualization techniques used in this project.
@@ -25,8 +40,22 @@ Documentation for the code
          C. Tree representation for Random forest
          D. ROC-AUC curves using Yellowbrick.
 
+   Usage is as follows ::
+
+         python visualization.py -m <model_name> -t <one_visualization_technique>
+
+   For help on available models and visualization techniques ::
+
+         python visualization.py --help
+
 4. app.py
-      This file predicts the disease of the input image
+      This file predicts the disease of the input image. Usage is as follows ::
+
+         python app.py -m <model_name> -i <test_image_index>
+
+      for help on usage ::
+
+         python app.py --help
 
 Classification main (app.py)
 ----------------------------
@@ -40,7 +69,7 @@ Classification visualization (visualization.py)
 
 Pre processing - load data (001_load_data.py)
 ----------------------------------------------
-.. automodule:: Preprocessing.001_load_data
+.. automodule:: preprocessing.001_load_data
    :members:
 
 Pre processing - data augmentation (002_data_augmentation.py)
@@ -54,7 +83,7 @@ Data augmentation techniques used are -
 4. Intensity scaling
 5. Random rotation
 
-.. automodule:: Preprocessing.002_data_augmentation
+.. automodule:: preprocessing.002_data_augmentation
    :members:
 
 Pre processing - HOG (003_hog.py)
@@ -62,7 +91,7 @@ Pre processing - HOG (003_hog.py)
 
 Feature descriptors are generated using Histograms of Oriented Gradients
 
-.. automodule:: Preprocessing.003_hog
+.. automodule:: preprocessing.003_hog
    :members:
 
 Models - CNN-Custom (cnn_custom)

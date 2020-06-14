@@ -2,14 +2,19 @@
 __pycache__/
 *.py[cod]
 *$py.class
+.idea
 
 # C extensions
 *.so
 
 # Distribution / packaging
 .Python
-data/
-results
+augment/
+intermediate/
+processed/
+test/
+raw/
+results/
 build/
 develop-eggs/
 dist/
@@ -138,15 +143,5 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-© 2020 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
+
+

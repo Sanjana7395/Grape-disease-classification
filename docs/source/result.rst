@@ -1,5 +1,13 @@
 Results
 ========
+
+Below are the results obtained on the test set for various models trained in the project.
+
+.. note:: The results obtained are system specific. Due to different combinations of the neural
+    network cudnn library versions and NVIDIA driver library versions, the results can be
+    slightly different. To the best of my knowledge, upon reproducing the environment, the
+    ballpark number will be close to the results obtained.
+
 +----------------------------------+---------------+
 | Models                           | Accuracy (%)  |
 +==================================+===============+

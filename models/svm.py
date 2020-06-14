@@ -1,6 +1,7 @@
-import joblib
 import numpy as np
 from sklearn.svm import LinearSVC
+import joblib
+from preprocessing.utils import make_folder
 
 
 def main():
@@ -27,6 +28,7 @@ def main():
     svm_model.fit(X_train, y_train)
     print(svm_model.score(X_test, y_test))
 
+    make_folder('../results/models')
     filename = '../results/models/SVM_model.sav'
     joblib.dump(svm_model, filename)
 

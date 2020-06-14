@@ -1,3 +1,4 @@
+import os
 import argparse
 import numpy as np
 import matplotlib.pyplot as plt
@@ -5,11 +6,11 @@ import seaborn as sns
 import yellowbrick
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import export_graphviz
 from tensorflow.keras.models import load_model
 import joblib
 import pickle
-from sklearn.tree import export_graphviz
-import os
+from preprocessing.utils import make_folder
 
 ROOT_DIR = 'results/models/'
 
@@ -69,7 +70,8 @@ def roc(x, y):
                                                         'powdery mildew'])
     visualizer.score(x, y)
     ax = visualizer.show()
-    ax.figure.savefig('output/auc_roc.png')
+    make_folder('results/visualization')
+    ax.figure.savefig('results/visualization/auc_roc.png')
 
 
 def tree():
@@ -81,8 +83,9 @@ def tree():
     """
     model = joblib.load(os.path.join(ROOT_DIR, 'Random_model.sav'))
     tree_num = model.estimators_
+    make_folder('results/visualization')
     for tree_in_forest in tree_num:
-        export_graphviz(tree_in_forest, out_file='output/tree.dot',
+        export_graphviz(tree_in_forest, out_file='results/visualization/tree.dot',
                         filled=True, rounded=True,
                         precision=2)
 
@@ -121,7 +124,8 @@ def plot(model):
     ax2.set_xlabel('Epoch')
     ax2.legend(['Train', 'Validation'], loc='upper right')
 
-    plt.savefig('output/acc_loss_{}.png'.format(model))
+    make_folder('results/visualization')
+    plt.savefig('results/visualization/acc_loss_{}.png'.format(model))
 
 
 def con_matrix(model, x, y):
@@ -178,7 +182,9 @@ def con_matrix(model, x, y):
     b += 0.5  # Add 0.5 to the bottom
     t -= 0.5  # Subtract 0.5 from the top
     plt.ylim(b, t)  # update the ylim(bottom, top) values
-    plt.savefig('output/confusion_matrix_{}.png'.format(model),
+
+    make_folder('results/visualization')
+    plt.savefig('results/visualization/confusion_matrix_{}.png'.format(model),
                 bbox_inches='tight')
 
 

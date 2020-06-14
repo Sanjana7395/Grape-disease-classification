@@ -1,5 +1,6 @@
 import numpy as np
 from skimage.feature import hog
+from preprocessing.utils import make_folder
 
 
 def hog_feature(image, multichannel=True):
@@ -45,6 +46,7 @@ def main():
     print(RF_test.shape)
 
     # Save data
+    make_folder('../data/processed')
     np.save('../data/processed/ImageTestHOG_input.npy', RF_test)
     np.save('../data/processed/ImageTrainHOG_input.npy', RF_train)
 
