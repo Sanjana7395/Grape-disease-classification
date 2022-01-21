@@ -1,6 +1,6 @@
 flake8==3.8.2
 h5py==2.10.0
-ipython==6.5.0
+ipython==7.16.3
 joblib==0.13.2
 jupyter==1.0.0
 Keras==2.3.1
